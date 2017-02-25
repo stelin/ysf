@@ -31,7 +31,6 @@ abstract class Application extends \ysf\base\Application
         
         $this->command = $command;
         $this->startFile = $args[0];
-        echo("ysf ".$this->startFile." $command\n");
         
         $this->checkServerStatus();
         $this->$methodName();
@@ -50,35 +49,25 @@ abstract class Application extends \ysf\base\Application
         }
         
         if($masterIslive && $this->command == 'start'){
-            echo("ysf ".$this->startFile." already running\n");
+            echo("ysf ".$this->startFile." is already running \n");
             exit;
         }
         
         if($masterIslive == false && $this->command != "start"){
-            echo("ysf ".$this->startFile." not run\n");
+            echo("ysf ".$this->startFile." is not running \n");
             exit;
         }
     }
     
-    public function parseHelp()
-    {
-        $help = "Usage: ysf {help|start|stop|reload|restart}\n";
-        $help .= "   ysf [help] show help information\n";
-        $help .= "   ysf [start] start http server\n";
-        $help .= "   ysf [stop] stop http server\n";
-        $help .= "   ysf [reload] reload worker process files\n";
-        $help .= "   ysf [restart] restart server and reload all files\n";
-        exit($help);
-    }
-    
     public function parseStart()
     {
+        echo "ysf ".$this->startFile." start success \n";
         $this->start();
     }
     public function parseStop()
     {
         @unlink($this->pidFile);
-        echo("ysf ".$this->startFile." is stoping ...\n");
+        echo("ysf ".$this->startFile." is stoping ... \n");
         
         $this->masterPid && posix_kill($this->masterPid, SIGTERM);
         
@@ -89,22 +78,25 @@ abstract class Application extends \ysf\base\Application
             $masterIslive = $this->masterPid && posix_kill($this->masterPid, SIGTERM);
             if ($masterIslive) {
                 if (time() - $startTime >= $timeout) {
-                    echo("ysf ".$this->startFile." stop fail\n");
+                    echo("ysf ".$this->startFile." stop fail \n");
                     exit;
                 }
                 usleep(10000);
                 continue;
             }
-            echo("ysf ".$this->startFile." stop success\n");
+            echo("ysf ".$this->startFile." stop success \n");
             break;
         }
-        exit(0);
     }
     public function parseReload()
     {
+        echo("ysf ".$this->startFile." is reloading \n");
+        posix_kill($this->managerPid, SIGUSR1);
+        echo("ysf ".$this->startFile." reload success \n");
     }
     public function parseRestart()
     {
-    
+        $this->parseStop();
+        $this->parseStart();
     }
 }

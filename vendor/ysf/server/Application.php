@@ -74,9 +74,7 @@ class Application extends \ysf\web\Application implements InterfaceServer
             $this->listen->on('Packet', [$this, 'onPacket']);
         }
         
-        
         $this->server->start();
-        
     }
     
     private function getHttpConfig()

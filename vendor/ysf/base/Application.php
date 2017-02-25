@@ -67,7 +67,6 @@ abstract class Application extends Component{
     
     public abstract function start();
     public abstract function parseCommand($args);
-    public abstract function parseHelp();
     public abstract function parseStart();
     public abstract function parseStop();
     public abstract function parseReload();
