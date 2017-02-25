@@ -19,6 +19,9 @@ abstract class Application extends Component{
     public $params = [];
     public $tcpEnable = true;
     public $processName = "php-ysf";
+    
+    
+    protected $setings = [];
     private $version = "0.1";
     
     
@@ -51,15 +54,24 @@ abstract class Application extends Component{
     
     /**
      * 运行服务
+     * 
+     * @param array $serverConf
      */
-    public function run()
+    public function run($serverConf)
     {
+        $this->setings = $serverConf;
+        
         global $argv;
-        var_dump($argv);
-        $this->start();
+        $this->parseCommand($argv);
     }
     
     public abstract function start();
+    public abstract function parseCommand($args);
+    public abstract function parseHelp();
+    public abstract function parseStart();
+    public abstract function parseStop();
+    public abstract function parseReload();
+    public abstract function parseRestart();
     
     public function getVersion()
     {

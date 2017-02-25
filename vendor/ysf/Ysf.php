@@ -9,6 +9,11 @@ namespace ysf;
 class Ysf
 {
     /**
+     * @var \ysf\base\Application
+     */
+    private static $app;
+    
+    /**
      * Configures an object with the initial property values.
      * @param object $object the object to be configured
      * @param array $properties the property initial values given in terms of name-value pairs.
@@ -22,5 +27,23 @@ class Ysf
     
         return $object;
     }
+    /**
+     * @return the $app
+     */
+    public static function app()
+    {
+        return self::$app;
+    }
+
+    /**
+     * @param \ysf\base\Application $app
+     */
+    public static function setApp($app)
+    {
+        self::$app = $app;
+    }
+
+    
+    
 }
 

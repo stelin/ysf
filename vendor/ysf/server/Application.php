@@ -6,9 +6,8 @@
  */
 namespace ysf\server;
 
-use ysf\ysf;
-use ysf\base\Application;
 use Swoole\Http\Server;
+use ysf\Ysf;
 
 /**
  * http server 
@@ -16,7 +15,7 @@ use Swoole\Http\Server;
  * @author stelin <phpcrazy@126.com>
  * @since 0.1
  */
-class HttpServer extends Application implements InterfaceServer
+class Application extends \ysf\web\Application implements InterfaceServer
 {
 
     /**
@@ -52,7 +51,9 @@ class HttpServer extends Application implements InterfaceServer
     {
         $httpConf = $this->getHttpConfig();
         $this->server = new \Swoole\Http\Server($httpConf['host'], $httpConf['port'], $httpConf['model'], $httpConf['type']);
-        $this->server->set(['worker_num' => 3]);
+        
+        Ysf::setApp($this);
+        $this->server->set($this->setings);
         $this->server->on('start', [$this, 'onStart']);
         $this->server->on('workerstart', [$this, 'onWorkerStart']);
         $this->server->on('task', [$this, 'onTask']);
@@ -73,7 +74,9 @@ class HttpServer extends Application implements InterfaceServer
             $this->listen->on('Packet', [$this, 'onPacket']);
         }
         
+        
         $this->server->start();
+        
     }
     
     private function getHttpConfig()
@@ -125,12 +128,16 @@ class HttpServer extends Application implements InterfaceServer
         
         return $configs;
     }
+    
+    
     /**
      * {@inheritDoc}
      * @see interfaceServer::onStart()
      */
     public function onStart(\Swoole\Http\Server $server)
     {
+        file_put_contents($this->pidFile, $server->master_pid);
+        file_put_contents($this->pidFile, ',' . $server->manager_pid, FILE_APPEND);
         swoole_set_process_name($this->processName." master process (/home/worker/data/www/swoole/bin/server.php)");
     }
 
@@ -286,6 +293,8 @@ class HttpServer extends Application implements InterfaceServer
         
         
     }
+    
+    
 
 
 
