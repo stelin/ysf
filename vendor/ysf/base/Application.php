@@ -54,15 +54,40 @@ abstract class Application extends Component{
     
     /**
      * 运行服务
-     * 
-     * @param array $serverConf
      */
-    public function run($serverConf)
+    public function run()
     {
-        $this->setings = $serverConf;
+        $this->setings = $this->readServerConf();
         
         global $argv;
         $this->parseCommand($argv);
+    }
+    
+    public function getVersion()
+    {
+        return $this->version;
+    }
+    
+    public function readServerConf()
+    {
+        $path = "/home/worker/data/www/ysf/bin/ysf.conf";
+        
+        $serverConfs = [];
+        $fp = @fopen($path, "r");
+        while (! feof($fp)){
+            $line = fgets($fp);
+            if(strpos($line, "#") === 0){
+                continue;
+            }
+            $result = preg_match("/\s*([a-z0-9\-\._\-]+)\s*=\s*(([0-9]+) | \"*\'*([a-z0-9\-\._\-]+)\"*\'*)/", $line, $confs);
+            if($result && isset($confs[1]) && isset($confs[4])){
+                $key = $confs[1];
+                $value = $confs[4];
+                $serverConfs[$key] = $value;
+            }
+        }
+        
+        return $serverConfs;
     }
     
     public abstract function start();
@@ -72,8 +97,4 @@ abstract class Application extends Component{
     public abstract function parseReload();
     public abstract function parseRestart();
     
-    public function getVersion()
-    {
-        return $this->version;
-    }
 }
