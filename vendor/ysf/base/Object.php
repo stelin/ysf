@@ -1,12 +1,10 @@
 <?php
-/**
- * @link https://github.com/stelin/ysf
- * @copyright Copyright 2016-2017 stelin develper.
- * @license https://github.com/stelin/ysf/license/
- */
+
 namespace ysf\base;
 
 use ysf\Ysf;
+use ysf\exception\InvalidCallException;
+use ysf\exception\UnknownPropertyException;
 
 /**
  * Object is the base class that implements the *property* feature.
@@ -70,8 +68,8 @@ use ysf\Ysf;
  * That is, a `$config` parameter (defaults to `[]`) should be declared as the last parameter
  * of the constructor, and the parent implementation should be called at the end of the constructor.
  *
- * @author stelin <phpcrazy@126.com>
- * @since 0.1
+ * @author Qiang Xue <qiang.xue@gmail.com>
+ * @since 2.0
  */
 class Object implements Configurable
 {
@@ -102,7 +100,6 @@ class Object implements Configurable
     {
         if (!empty($config)) {
             Ysf::configure($this, $config);
-            
         }
         $this->init();
     }

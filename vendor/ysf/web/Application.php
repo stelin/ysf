@@ -99,4 +99,10 @@ abstract class Application extends \ysf\base\Application
         $this->parseStop();
         $this->parseStart();
     }
+    
+    public function getUrlManager()
+    {
+        return $this->get('urlManager');
+    }
+    
 }

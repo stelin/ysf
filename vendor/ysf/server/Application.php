@@ -218,7 +218,10 @@ class Application extends \ysf\web\Application implements InterfaceServer
      */
     public function onRequest(\Swoole\Http\Request $request, \Swoole\Http\Response $response)
     {
-     
+        list($route, $params) = Ysf::app()->urlManager->parseRequest($request);
+        
+        var_dump($route);
+        var_dump($params);
         $response->end("hello world \n");
     }
 

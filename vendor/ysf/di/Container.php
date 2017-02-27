@@ -95,7 +95,7 @@ use yii\helpers\ArrayHelper;
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
-class Container extends Component
+class Container
 {
     /**
      * @var array singleton objects indexed by their types
@@ -174,7 +174,7 @@ class Container extends Component
         } elseif (is_object($definition)) {
             return $this->_singletons[$class] = $definition;
         } else {
-            throw new InvalidConfigException('Unexpected object definition type: ' . gettype($definition));
+            throw new \ysf\exception\InvalidConfigException('Unexpected object definition type: ' . gettype($definition));
         }
 
         if (array_key_exists($class, $this->_singletons)) {
@@ -328,12 +328,12 @@ class Container extends Component
                 if (strpos($class, '\\') !== false) {
                     $definition['class'] = $class;
                 } else {
-                    throw new InvalidConfigException("A class definition requires a \"class\" member.");
+                    throw new \ysf\exception\InvalidConfigException("A class definition requires a \"class\" member.");
                 }
             }
             return $definition;
         } else {
-            throw new InvalidConfigException("Unsupported definition type for \"$class\": " . gettype($definition));
+            throw new \ysf\exception\InvalidConfigException("Unsupported definition type for \"$class\": " . gettype($definition));
         }
     }
 
@@ -373,7 +373,7 @@ class Container extends Component
             return $reflection->newInstanceArgs($dependencies);
         }
 
-        if (!empty($dependencies) && $reflection->implementsInterface('yii\base\Configurable')) {
+        if (!empty($dependencies) && $reflection->implementsInterface('ysf\base\Configurable')) {
             // set $config as the last parameter (existing one will be overwritten)
             $dependencies[count($dependencies) - 1] = $config;
             return $reflection->newInstanceArgs($dependencies);
@@ -555,7 +555,7 @@ class Container extends Component
                 $args[] = $param->getDefaultValue();
             } elseif (!$param->isOptional()) {
                 $funcName = $reflection->getName();
-                throw new InvalidConfigException("Missing required parameter \"$name\" when calling \"$funcName\".");
+                throw new \ysf\exception\InvalidConfigException("Missing required parameter \"$name\" when calling \"$funcName\".");
             }
         }
 
