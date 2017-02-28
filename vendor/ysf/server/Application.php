@@ -9,6 +9,7 @@ namespace ysf\server;
 use Swoole\Http\Server;
 use ysf\base\Controller;
 use ysf\Ysf;
+use ysf\helpers\ResponseHelper;
 
 /**
  * http server 
@@ -22,12 +23,12 @@ class Application extends \ysf\web\Application implements InterfaceServer
     /**
      * @var string
      */
-    const DEFAULT_HTTP_HOST = "127.0.0.1";
+    const DEFAULT_HTTP_HOST = "172.17.0.3";
 
     /**
      * @var int
      */
-    const DEFAULT_HTTP_PORT = 8066;
+    const DEFAULT_HTTP_PORT = 80;
 
     /**
      * @var string
@@ -219,13 +220,35 @@ class Application extends \ysf\web\Application implements InterfaceServer
      */
     public function onRequest(\Swoole\Http\Request $request, \Swoole\Http\Response $response)
     {
-        list($route, $params) = $this->urlManager->parseRequest($request);
+        register_shutdown_function(function() use ($response){
+            $error = error_get_last();
+            if (isset($error['type'])) {
+                $message = $error['message'];
+                ResponseHelper::outputJson($response, null ,$message);
+            }
+        });
         
-        /* @var $controller Controller */
-        list($controller, $actionId) = $this->createController($route);
-        $controller->setRequest($request);
-        $controller->setResponse($response);
-        $controller->run($actionId, $params);
+        set_error_handler(function($error, $error_string, $filename, $line, $symbols) use ($response){
+            ResponseHelper::outputJson($response, null ,$error_string);
+        });
+        
+        // chrome 2 once request
+        if(isset($request->server['request_uri']) && $request->server['request_uri'] == '/favicon.ico'){
+            return false;
+        }
+        
+        try {
+            list($route, $params) = $this->urlManager->parseRequest($request);
+            
+            /* @var $controller Controller */
+            list($controller, $actionId) = $this->createController($route);
+            
+            $controller->setRequest($request);
+            $controller->setResponse($response);
+            $controller->run($actionId, $params);
+        } catch (\Exception $e) {
+            ResponseHelper::outputJson($response, null, $e->getMessage());
+        }
     }
 
     /**

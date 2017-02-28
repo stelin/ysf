@@ -5,6 +5,7 @@ namespace ysf\base;
 use ysf\Ysf;
 use ysf\exception\InvalidCallException;
 use ysf\exception\UnknownPropertyException;
+use ysf\exception\UnknownMethodException;
 
 /**
  * Object is the base class that implements the *property* feature.

@@ -98,7 +98,7 @@ abstract class Application extends ServiceLocator{
             if(strpos($line, "#") === 0){
                 continue;
             }
-            $result = preg_match("/\s*([a-z0-9\-\._\-]+)\s*=\s*(([0-9]+) | \"*\'*([a-z0-9\-\._\-]+)\"*\'*)/", $line, $confs);
+            $result = preg_match("/\s*([a-z0-9\-\._\-]+)\s*=\s*(([0-9]+) | \"*\'*([a-z0-9\-\._\-\/]+)\"*\'*)/", $line, $confs);
             if($result && isset($confs[1]) && isset($confs[4])){
                 $key = $confs[1];
                 $value = $confs[4];

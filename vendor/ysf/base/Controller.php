@@ -2,6 +2,8 @@
 namespace ysf\base;
 
 use ysf\Ysf;
+use ysf\exception\UnknownMethodException;
+use ysf\helpers\ResponseHelper;
 
 class Controller extends Object{
     
@@ -58,29 +60,21 @@ class Controller extends Object{
             return false;
         }
         if (! method_exists($this, $id)) {
-            // exception
+//             throw new \Exception($id.' action not found!');
+//                throw new UnknownMethodException("action not found");
         }
         
         return call_user_func_array([$this, $id], $params);
     }
     
-    public function render($templateId, $data){
-        
+    public function render($templateId, $data = []){
+        $this->response->end($templateId);
+        $this->reset();
     }
     
     public function outputJson($data = null, $message = '', $status = 200, $callback = null)
     {
-        if($data === null){
-            $data = new \stdClass();
-        }
-        
-        $json = json_encode(array(
-            'data'       => $data,
-            'status'     => $status,
-            'message'    => $message,
-            'serverTime' => microtime(true)
-        ));
-        $this->response->end($json);
+        ResponseHelper::outputJson($this->response, $data, $message, $status, $callback);
         $this->reset();
     }
     

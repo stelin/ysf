@@ -7,6 +7,6 @@ class DemoController extends Controller
 {
     public function showHtml()
     {
-        
+        $this->render("show html");
     }
 }
