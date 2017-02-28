@@ -20,9 +20,9 @@ class ObjectPool
         return self::$instance;
     }
     
-    public static function getObject()
+    public static function getObject($name)
     {
-        if (isset(self::$pool[$name])) {
+        if (!isset(self::$pool[$name])) {
             self::$pool[$name] = new \SplQueue();
         }
         

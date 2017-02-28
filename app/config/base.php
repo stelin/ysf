@@ -14,7 +14,7 @@ $config = [
     'components' => [
         'urlManager' => [
             'rules' => [
-                "/InterfaceMap" => "/InterfaceMap/Index/Index",
+                "/service" => "/service/demo2/showJson",
                 '/post/<id:\d+>' => 'post/view'
             ],
         ],

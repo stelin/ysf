@@ -25,6 +25,7 @@ abstract class Application extends ServiceLocator{
     public $name;
     public $basePath;
     public $runtimePath;
+    public $defaultRoute = "/index/index";
     public $components;
     
     public $tcp = [];
@@ -33,9 +34,12 @@ abstract class Application extends ServiceLocator{
     public $tcpEnable = true;
     public $processName = "php-ysf";
     
+    public $controllerNamespace = 'app\\controllers';
+    
     
     protected $setings = [];
     private $version = "0.1";
+    
     
     
     /**
@@ -56,13 +60,22 @@ abstract class Application extends ServiceLocator{
      */
     public function run()
     {
-        $request = new \Swoole\Http\Request();
-        $request->server['path_info'] = '/InterfaceMap';
-        $request->server['path_info'] = '/post/1232';
-        $request->server['request_method'] = 'GET';
+//         $request = new \Swoole\Http\Request();
+//         $request->server['path_info'] = '/service';
+//         //         $request->server['path_info'] = '/post/1232';
+//         $request->server['request_method'] = 'GET';
         
-        var_dump($this->urlManager->parseRequest($request));
-        exit();
+        
+//         list($route, $params) = $this->urlManager->parseRequest($request);
+//         /* @var $controller Controller */
+//         list($controller, $actionId) = $this->createController($route);
+        
+//         $controller->setRequest($request);
+//         $controller->setResponse($response);
+//         $response = $controller->run($actionId, $params);
+//         exit();
+
+        
         $this->setings = $this->readServerConf();
         
         global $argv;
@@ -205,6 +218,102 @@ abstract class Application extends ServiceLocator{
             } elseif (is_array($config['components'][$id]) && !isset($config['components'][$id]['class'])) {
                 $config['components'][$id]['class'] = $component['class'];
             }
+        }
+    }
+    
+    public function createController($route)
+    {
+        list($controllerId, $actionId) = $this->getPathRoute($route);
+        
+        $controller = ObjectPool::getInstance()->getObject($controllerId);
+        if($controller == null){
+            $controller = $this->createControllerById($controllerId);
+        }
+        
+        if ($controller === null && $route !== '') {
+            $controller = $this->createControllerByID($controllerId . '/' . $actionId);
+            $route = '';
+        }
+        
+        if($controller === null){
+            // exceptions
+        }
+        
+        return [$controller, $actionId];
+    }
+    
+       
+    public function getPathRoute($route)
+    {
+        if ($route === '') {
+            $route = $this->defaultRoute;
+        }
+        
+        $route = trim($route, '/');
+        if (strpos($route, '//') !== false) {
+            return false;
+        }
+        
+        if (strpos($route, '/') !== false) {
+            list ($id, $route) = explode('/', $route, 2);
+        } else {
+            $id = $route;
+            $route = '';
+        }
+        
+        if (($pos = strrpos($route, '/')) !== false) {
+            $id .= '/' . substr($route, 0, $pos);
+            $route = substr($route, $pos + 1);
+        }
+        
+        return [$id, $route];
+    }
+    
+    /**
+     * Creates a controller based on the given controller ID.
+     *
+     * The controller ID is relative to this module. The controller class
+     * should be namespaced under [[controllerNamespace]].
+     *
+     * Note that this method does not check [[modules]] or [[controllerMap]].
+     *
+     * @param string $id the controller ID
+     * @return Controller the newly created controller instance, or null if the controller ID is invalid.
+     * @throws InvalidConfigException if the controller class and its file name do not match.
+     * This exception is only thrown when in debug mode.
+     */
+    public function createControllerById($id)
+    {
+        $pos = strrpos($id, '/');
+        if ($pos === false) {
+            $prefix = '';
+            $className = $id;
+        } else {
+            $prefix = substr($id, 0, $pos + 1);
+            $className = substr($id, $pos + 1);
+        }
+
+    
+        // 匹配正则修改兼容controller LoginUser/testOne loginUser/testOne login-user/testOne
+        if (!preg_match('%^[a-zA-Z][a-zA-Z0-9\\-_]*$%', $className)) {
+            return null;
+        }
+        if ($prefix !== '' && !preg_match('%^[a-z0-9_/]+$%i', $prefix)) {
+            return null;
+        }
+    
+        // namespace和prefix保持一致，搜字母都大写或都小写，namespace app\controllers\SecurityKey; prefix=SecurityKey
+        $className = str_replace(' ', '', ucwords(str_replace('-', ' ', $className))) . 'Controller';
+        $className = ltrim($this->controllerNamespace . '\\' . str_replace('/', '\\', $prefix)  . $className, '\\');
+        if (strpos($className, '-') !== false || !class_exists($className)) {
+            return null;
+        }
+    
+        if (is_subclass_of($className, 'ysf\base\Controller')) {
+            $controller = new $className($id);
+            return get_class($controller) === $className ? $controller : null;
+        }else{
+            return null;
         }
     }
     

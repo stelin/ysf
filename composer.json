@@ -6,7 +6,8 @@
         "classmap": [
         ],
         "psr-4": {
-       		"ysf\\": "vendor/ysf/" 
+       		"ysf\\": "vendor/ysf/",
+       		"app\\": "app/"
         }
     },
     "repositories": {

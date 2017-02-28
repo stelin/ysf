@@ -7,6 +7,7 @@
 namespace ysf\server;
 
 use Swoole\Http\Server;
+use ysf\base\Controller;
 use ysf\Ysf;
 
 /**
@@ -218,11 +219,13 @@ class Application extends \ysf\web\Application implements InterfaceServer
      */
     public function onRequest(\Swoole\Http\Request $request, \Swoole\Http\Response $response)
     {
-        list($route, $params) = Ysf::app()->urlManager->parseRequest($request);
+        list($route, $params) = $this->urlManager->parseRequest($request);
         
-        var_dump($route);
-        var_dump($params);
-        $response->end("hello world \n");
+        /* @var $controller Controller */
+        list($controller, $actionId) = $this->createController($route);
+        $controller->setRequest($request);
+        $controller->setResponse($response);
+        $controller->run($actionId, $params);
     }
 
     /**

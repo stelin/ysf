@@ -8,4 +8,5 @@ $baseDir = dirname($vendorDir);
 return array(
     'ysf\\' => array($vendorDir . '/ysf'),
     'phpseclib\\' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
+    'app\\' => array($baseDir . '/app'),
 );

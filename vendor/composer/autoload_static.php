@@ -15,6 +15,10 @@ class ComposerStaticInite7bbc9e18f4d13c4675486b0c8f56260
         array (
             'phpseclib\\' => 10,
         ),
+        'a' => 
+        array (
+            'app\\' => 4,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -25,6 +29,10 @@ class ComposerStaticInite7bbc9e18f4d13c4675486b0c8f56260
         'phpseclib\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib',
+        ),
+        'app\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/app',
         ),
     );
 
