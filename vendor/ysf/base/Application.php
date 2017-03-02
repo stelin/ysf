@@ -11,11 +11,13 @@ use ysf\Ysf;
 use ysf\exception\InvalidParamException;
 use ysf\exception\InvalidConfigException;
 use ysf\di\ServiceLocator;
+use ysf\log\Logger;
 
 /**
  * base application
  *
  * @property \ysf\web\UrlManager $urlManager The URL manager for this application. This property is read-only.
+ * @property \ysf\log\Dispatcher $log log is
  * 
  * @author stelin <phpcrazy@126.com>
  * @since 0.1
@@ -53,6 +55,9 @@ abstract class Application extends ServiceLocator{
         $this->setComponents($config['components']);
         
         parent::__construct($config);
+        
+        // 初始化日志
+        $this->log;
     }
     
     /**
@@ -60,20 +65,24 @@ abstract class Application extends ServiceLocator{
      */
     public function run()
     {
-//         $request = new \Swoole\Http\Request();
-//         $request->server['path_info'] = '/service';
-//         //         $request->server['path_info'] = '/post/1232';
-//         $request->server['request_method'] = 'GET';
+//         Ysf::getLogger()->log("mongo level", Logger::LEVEL_MONGO);
+//         Ysf::getLogger()->log("redis level", Logger::LEVEL_REDIS);
+//         Ysf::getLogger()->log("mysql level", Logger::LEVEL_MYSQL);
+//         Ysf::getLogger()->log("http level", Logger::LEVEL_HTTP);
+//         Ysf::getLogger()->log("error level", Logger::LEVEL_ERROR);
+//         Ysf::getLogger()->log("notice level", Logger::LEVEL_NOTICE);
+//         Ysf::getLogger()->log("warning level", Logger::LEVEL_WARNING);
+        
+        Ysf::error("error");
+        Ysf::trace("trace");
+        Ysf::warning("warning");
+        Ysf::notice(Ysf::formateNotice(uniqid(), 231, "/index/index", ['a'=>'b','c'=>'d'], 500));
+        
+        Ysf::getLogger()->flush();
         
         
-//         list($route, $params) = $this->urlManager->parseRequest($request);
-//         /* @var $controller Controller */
-//         list($controller, $actionId) = $this->createController($route);
-        
-//         $controller->setRequest($request);
-//         $controller->setResponse($response);
-//         $response = $controller->run($actionId, $params);
-//         exit();
+        echo "333";
+        exit();
 
         
         $this->setings = $this->readServerConf();
@@ -113,6 +122,7 @@ abstract class Application extends ServiceLocator{
     {
         return [
             'urlManager' => ['class' => 'ysf\web\UrlManager'],
+            'log' => ['class' => 'ysf\log\Dispatcher'],
         ];
     }
     

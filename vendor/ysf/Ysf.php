@@ -9,6 +9,7 @@ namespace ysf;
 use ysf\di\Container;
 use ysf\exception\InvalidParamException;
 use ysf\exception\InvalidConfigException;
+use ysf\log\Logger;
 
 class Ysf
 {
@@ -32,6 +33,8 @@ class Ysf
      * @see Container
      */
     public static $container;
+    
+    private static $_logger;
     
     /**
      * Configures an object with the initial property values.
@@ -61,6 +64,78 @@ class Ysf
     public static function setApp($app)
     {
         self::$app = $app;
+    }
+    
+    /**
+     * @return Logger message logger
+     */
+    public static function getLogger()
+    {
+        if (self::$_logger !== null) {
+            return self::$_logger;
+        } else {
+            return self::$_logger = static::createObject('ysf\log\Logger');
+        }
+    }
+    
+    public static function error($message)
+    {
+        self::getLogger()->log(self::getTrace($message), Logger::LEVEL_ERROR);
+    }
+    public static function trace($message)
+    {
+        self::getLogger()->log(self::getTrace($message), Logger::LEVEL_TRACE);
+    }
+    public static function warning($message)
+    {
+        self::getLogger()->log(self::getTrace($message), Logger::LEVEL_WARNING);
+    }
+    
+    public static function notice($message)
+    {
+        self::getLogger()->log($message, Logger::LEVEL_NOTICE);
+    }
+    
+    public static function formateNotice($logid, $cost, $uri, $params, $status)
+    {
+        return "[logid:$logid] [$cost(ms)] [$uri] [params=".json_encode($params)." status=$status]";
+    }
+    
+    public static function getTrace($message)
+    {
+        $traces = debug_backtrace();
+        $count = count($traces);
+        $ex = '';
+        if ($count >= 2) {
+            $info = $traces[1];
+            if (isset($info['file'], $info['line'])) {
+                $filename = basename($info['file']);
+                $linenum = $info['line'];
+                $ex = "$filename:$linenum";
+            }
+        }
+        if ($count >= 3) {
+            $info = $traces[2];
+            if (isset($info['class'], $info['type'], $info['function'])) {
+                $ex .= ',' . $info['class'] . $info['type'] . $info['function'];
+            } elseif (isset($info['function'])) {
+                $ex .= ',' . $info['function'];
+            }
+        }
+    
+        if (!empty($ex)) {
+            $message = "trace[$ex] " . $message;
+        }
+        return $message;
+    }
+    
+    /**
+     * Sets the logger object.
+     * @param Logger $logger the logger object.
+     */
+    public static function setLogger($logger)
+    {
+        self::$_logger = $logger;
     }
     
     /**

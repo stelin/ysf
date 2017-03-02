@@ -18,6 +18,23 @@ $config = [
                 '/post/<id:\d+>' => 'post/view'
             ],
         ],
+        'log' => [
+            'targets' => [
+                'notice' => [
+                    'class' => 'ysf\log\FileTarget',
+                    'logFile' => '@runtime/notice.log',
+                    'levels' => ['trace', 'mysql', 'notice','mongo','redis', 'http'],
+                ],
+                'application' => [
+                    'class' => 'ysf\log\FileTarget',
+                    'logFile' => '@runtime/application.log',
+                    'levels' => ['error','warning'],
+                ],
+            ],
+            "logger" => [
+                'class' => 'ysf\log\Logger',
+            ],
+        ],
     ],
 
     // 参数配置

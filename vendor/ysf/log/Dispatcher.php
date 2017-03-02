@@ -1,72 +1,11 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
+namespace ysf\log;
 
-namespace yii\log;
+use ysf\base\Object;
+use ysf\Ysf;
 
-use Yii;
-use yii\base\Component;
-use yii\base\ErrorHandler;
-use ug\helpers\LogHelper;
-
-/**
- * Dispatcher manages a set of [[Target|log targets]].
- *
- * Dispatcher implements the [[dispatch()]]-method that forwards the log messages from a [[Logger]] to
- * the registered log [[targets]].
- *
- * An instance of Dispatcher is registered as a core application component and can be accessed using `Yii::$app->log`.
- *
- * You may configure the targets in application configuration, like the following:
- *
- * ```php
- * [
- *     'components' => [
- *         'log' => [
- *             'targets' => [
- *                 'file' => [
- *                     'class' => 'yii\log\FileTarget',
- *                     'levels' => ['trace', 'info'],
- *                     'categories' => ['yii\*'],
- *                 ],
- *                 'email' => [
- *                     'class' => 'yii\log\EmailTarget',
- *                     'levels' => ['error', 'warning'],
- *                     'message' => [
- *                         'to' => 'admin@example.com',
- *                     ],
- *                 ],
- *             ],
- *         ],
- *     ],
- * ]
- * ```
- *
- * Each log target can have a name and can be referenced via the [[targets]] property as follows:
- *
- * ```php
- * Yii::$app->log->targets['file']->enabled = false;
- * ```
- *
- * @property integer $flushInterval How many messages should be logged before they are sent to targets. This
- * method returns the value of [[Logger::flushInterval]].
- * @property Logger $logger The logger. If not set, [[\Yii::getLogger()]] will be used. Note that the type of
- * this property differs in getter and setter. See [[getLogger()]] and [[setLogger()]] for details.
- * @property integer $traceLevel How many application call stacks should be logged together with each message.
- * This method returns the value of [[Logger::traceLevel]]. Defaults to 0.
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
- */
-class Dispatcher extends Component
+class Dispatcher extends Object
 {
-    /**
-     * @var array|Target[] the log targets. Each array element represents a single [[Target|log target]] instance
-     * or the configuration for creating the log target instance.
-     */
     public $targets = [];
 
     /**
@@ -85,52 +24,36 @@ class Dispatcher extends Component
             $this->setLogger($config['logger']);
             unset($config['logger']);
             
-            // init loghelper
-            LogHelper::setLogger($this->_logger);
+            Ysf::setLogger($this->_logger);
         }
-        // connect logger and dispatcher
         $this->getLogger();
-
+        
         parent::__construct($config);
     }
 
-    /**
-     * @inheritdoc
-     */
     public function init()
     {
         parent::init();
 
         foreach ($this->targets as $name => $target) {
             if (!$target instanceof Target) {
-                $this->targets[$name] = Yii::createObject($target);
+                $this->targets[$name] = Ysf::createObject($target);
             }
         }
     }
 
-    /**
-     * Gets the connected logger.
-     * If not set, [[\Yii::getLogger()]] will be used.
-     * @property Logger the logger. If not set, [[\Yii::getLogger()]] will be used.
-     * @return Logger the logger.
-     */
     public function getLogger()
     {
         if ($this->_logger === null) {
-            $this->setLogger(Yii::getLogger());
+            $this->setLogger(Ysf::getLogger());
         }
         return $this->_logger;
     }
 
-    /**
-     * Sets the connected logger.
-     * @param Logger|string|array $value the logger to be used. This can either be a logger instance
-     * or a configuration that will be used to create one using [[Yii::createObject()]].
-     */
     public function setLogger($value)
     {
         if (is_string($value) || is_array($value)) {
-            $value = Yii::createObject($value);
+            $value = Ysf::createObject($value);
         }
         $this->_logger = $value;
         $this->_logger->dispatcher = $this;
@@ -193,7 +116,7 @@ class Dispatcher extends Component
                 } catch (\Exception $e) {
                     $target->enabled = false;
                     $targetErrors[] = [
-                        'Unable to send log via ' . get_class($target) . ': ' . ErrorHandler::convertExceptionToString($e),
+                        'Unable to send log via ' . get_class($target) . ': ' . $e->getMessage(),
                         Logger::LEVEL_WARNING,
                         __METHOD__,
                         microtime(true),

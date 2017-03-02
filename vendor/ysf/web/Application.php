@@ -105,4 +105,9 @@ abstract class Application extends \ysf\base\Application
         return $this->get('urlManager');
     }
     
+    public function getLog()
+    {
+        return $this->get('log');
+    }
+    
 }
