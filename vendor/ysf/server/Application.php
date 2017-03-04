@@ -228,18 +228,6 @@ class Application extends \ysf\web\Application implements InterfaceServer
             ApplicationContext::CONTEXT_URI => $request->server['path_info']
         ]);
         
-        register_shutdown_function(function() use ($response){
-            $error = error_get_last();
-            if (isset($error['type'])) {
-                $message = $error['message'];
-                ResponseHelper::outputJson($response, null ,$message);
-            }
-        });
-        
-        set_error_handler(function($error, $error_string, $filename, $line, $symbols) use ($response){
-            ResponseHelper::outputJson($response, null ,$error_string);
-        });
-        
         // chrome 2 once request
         if(isset($request->server['request_uri']) && $request->server['request_uri'] == '/favicon.ico'){
             return false;

@@ -58,6 +58,10 @@ abstract class Application extends ServiceLocator{
         
         // 初始化日志
         $this->log;
+        
+        // 错误处理
+        register_shutdown_function([$this, 'handlerFataError']);
+        set_error_handler([$this, 'handlerError']);
     }
     
     /**
@@ -65,26 +69,6 @@ abstract class Application extends ServiceLocator{
      */
     public function run()
     {
-//         Ysf::getLogger()->log("mongo level", Logger::LEVEL_MONGO);
-//         Ysf::getLogger()->log("redis level", Logger::LEVEL_REDIS);
-//         Ysf::getLogger()->log("mysql level", Logger::LEVEL_MYSQL);
-//         Ysf::getLogger()->log("http level", Logger::LEVEL_HTTP);
-//         Ysf::getLogger()->log("error level", Logger::LEVEL_ERROR);
-//         Ysf::getLogger()->log("notice level", Logger::LEVEL_NOTICE);
-//         Ysf::getLogger()->log("warning level", Logger::LEVEL_WARNING);
-        
-//         Ysf::error("error");
-//         Ysf::trace("trace");
-//         Ysf::warning("warning");
-//         Ysf::notice(Ysf::formateNotice(uniqid(), 231, "/index/index", ['a'=>'b','c'=>'d'], 500));
-        
-//         Ysf::getLogger()->flush();
-        
-        
-//         echo "333";
-//         exit();
-
-        
         $this->setings = $this->readServerConf();
         
         global $argv;
@@ -325,6 +309,22 @@ abstract class Application extends ServiceLocator{
         }else{
             return null;
         }
+    }
+    
+    public function handlerFataError()
+    {
+        $error = error_get_last();
+        if (isset($error['type'])) {
+            $message = $error['message'];
+            $file = $error['file'];
+            $line = $error['line'];
+            Ysf::error($filename.":".$line." ".$error_string);
+        }
+    }
+    
+    public function handlerError($error, $error_string, $filename, $line, $symbols)
+    {
+        Ysf::error($filename.":".$line." ".$error_string);
     }
     
     public abstract function start();

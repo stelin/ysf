@@ -101,12 +101,11 @@ class Logger extends Object
         $category = $this->getCategory();
         $message = implode(" ", $messageAry);
     
-//         $this->profiles = [];
-//         $this->countings = [];
-//         $this->pushlogs = [];
-//         $this->profileStacks = [];
-        
+        unset($this->profiles[$logid]);
+        unset($this->countings[$logid]);
         unset($this->pushlogs[$logid]);
+        unset($this->profileStacks[$logid]);
+        
         $this->log($message, self::LEVEL_NOTICE, $category);
     }
     

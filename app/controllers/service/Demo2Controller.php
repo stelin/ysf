@@ -29,6 +29,8 @@ class Demo2Controller extends Controller {
         
         $str = 'hello'.SYSTEM_NAME;
         
+        $a = $b;
+        
         $this->outputJson(null, $str);
     }
 }

@@ -45,7 +45,7 @@ abstract class Application extends \ysf\base\Application
         
             $this->masterPid = $pids[0];
             $this->managerPid = $pids[1];
-            $masterIslive = $this->masterPid && @posix_kill($masterPid, 0);
+            $masterIslive = $this->masterPid && @posix_kill($this->masterPid, 0);
         }
         
         if($masterIslive && $this->command == 'start'){
