@@ -12,8 +12,23 @@ class Demo2Controller extends Controller {
     
     public function hello()
     {
+        Ysf::profileStart("helloClass");
         Ysf::warning("waning message");
         Ysf::error("error message");
-        $this->outputJson(null, 'hello');
+        Ysf::pushlog("name", "stelin");
+        Ysf::profileEnd("helloClass");
+        
+        Ysf::profileStart("helloClass");
+        Ysf::warning("waning message");
+        Ysf::error("error message");
+        Ysf::pushlog("name", "stelin");
+        Ysf::profileEnd("helloClass");
+        
+        Ysf::counting("redis.get", 1, 10);
+        Ysf::counting("redis.get", 2, 100);
+        
+        $str = 'hello'.SYSTEM_NAME;
+        
+        $this->outputJson(null, $str);
     }
 }

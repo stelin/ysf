@@ -16,6 +16,11 @@ class Logger extends Object
     public $flushInterval = 1000;
     public $traceLevel = 0;
     public $dispatcher;
+    
+    public $pushlogs = [];
+    public $profileStacks = [];
+    public $profiles = [];
+    public $countings = [];
 
     public function init()
     {
@@ -72,15 +77,16 @@ class Logger extends Object
      */
     public function apendNoticeLog()
     {
+        $logid = ApplicationContext::getContext(ApplicationContext::CONTEXT_LOGID);
         $requestBeginTime = ApplicationContext::getContext(ApplicationContext::CONTEXT_BEGIN_TIME);
         // php耗时单位ms毫秒
-        $timeUsed = sprintf("%.0f", (microtime(true)-$requestBeginTime)*1000);
+        $timeUsed = sprintf("%.2f", (microtime(true)-$requestBeginTime)*1000);
         // php运行内存大小单位M
         $memUsed = sprintf("%.0f", memory_get_peak_usage()/(1024*1024));
     
-        $profileInfo = '';
-        $countingInfo = '';
-        $pushlogs = [];
+        $profileInfo = $this->getProfilesInfos();
+        $countingInfo = $this->getCountingInfo();
+        $pushlogs = isset($this->pushlogs[$logid]) ? $this->pushlogs[$logid]: [];
         $uri = ApplicationContext::getContext(ApplicationContext::CONTEXT_URI);
         
     
@@ -99,8 +105,136 @@ class Logger extends Object
 //         $this->countings = [];
 //         $this->pushlogs = [];
 //         $this->profileStacks = [];
+        
+        unset($this->pushlogs[$logid]);
         $this->log($message, self::LEVEL_NOTICE, $category);
     }
+    
+    /**
+     * pushlog日志
+     *
+     * @param string $key
+     * @param mixed $value
+     */
+    public function pushLog($key, $val)
+    {
+        $logid = ApplicationContext::getContext(ApplicationContext::CONTEXT_LOGID);
+        
+        if (!(is_string($key) || is_numeric($key))) {
+            return;
+        }
+        $key = urlencode($key);
+        if (is_array($val)) {
+            $this->pushlogs[$logid][] = "$key=" . json_encode($val);
+        } elseif (is_bool($val)) {
+            $this->pushlogs[$logid][] = "$key=" . var_export($val, true);
+        } elseif (is_string($val) || is_numeric($val)) {
+            $this->pushlogs[$logid][] = "$key=" . urlencode($val);
+        } elseif (is_null($val)) {
+            $this->pushlogs[$logid][] = "$key=";
+        }
+    }
+    
+    /**
+     * 标记开始
+     *
+     * @param string $name
+     */
+    public function profileStart($name)
+    {
+        $logid = ApplicationContext::getContext(ApplicationContext::CONTEXT_LOGID);
+        if(is_string($name) == false || empty($name)){
+            return ;
+        }
+        $this->profileStacks[$logid][$name]['start'] = microtime(true);
+    }
+    
+    /**
+     * 标记开始
+     *
+     * @param string $name
+     */
+    public function profileEnd($name)
+    {
+        $logid = ApplicationContext::getContext(ApplicationContext::CONTEXT_LOGID);
+        if (is_string($name) == false || empty($name)) {
+            return;
+        }
+    
+        if (! isset($this->profiles[$logid][$name])) {
+            $this->profiles[$logid][$name] = [
+                'cost' => 0,
+                'total' => 0
+            ];
+        }
+    
+        $this->profiles[$logid][$name]['cost'] += microtime(true) - $this->profileStacks[$logid][$name]['start'];
+        $this->profiles[$logid][$name]['total'] = $this->profiles[$logid][$name]['total'] + 1;
+        
+    }
+    
+    /**
+     * 组装profiles
+     */
+    public function getProfilesInfos()
+    {
+        $logid = ApplicationContext::getContext(ApplicationContext::CONTEXT_LOGID);
+        
+        $profiles = [];
+        if(isset($this->profiles[$logid])){
+            $profiles = $this->profiles[$logid];
+        }
+        $profileAry = [];
+        foreach ($profiles as $key => $profile){
+            if(!isset($profile['cost']) || !isset($profile['total'])){
+                continue;
+            }
+            $cost = sprintf("%.2f", $profile['cost'] * 1000);
+            $profileAry[] = "$key=" .  $cost. '(ms)/' . $profile['total'];
+        }
+    
+        return implode(",", $profileAry);
+    }
+    
+    
+    public function counting($name, $hit, $total = null)
+    {
+        $logid = ApplicationContext::getContext(ApplicationContext::CONTEXT_LOGID);
+        
+        if (!is_string($name) || empty($name)) {
+            return;
+        }
+        if (!isset($this->countings[$logid][$name])) {
+            $this->countings[$logid][$name] = ['hit' => 0, 'total' => 0];
+        }
+        $this->countings[$logid][$name]['hit'] += intval($hit);
+        if ($total !== null) {
+            $this->countings[$logid][$name]['total'] += intval($total);
+        }
+    }
+    
+    /**
+     * 组装字符串
+     */
+    public function getCountingInfo()
+    {
+        $logid = ApplicationContext::getContext(ApplicationContext::CONTEXT_LOGID);
+        
+        if(!isset($this->countings[$logid]) || empty($this->countings[$logid])){
+            return "";
+        }
+    
+        $countAry = [];
+        foreach ($this->countings[$logid] as $name => $counter){
+            if(isset($counter['hit'], $counter['total']) && $counter['total'] != 0){
+                $countAry[] = "$name=".$counter['hit']."/".$counter['total'];
+            }elseif(isset($counter['hit'])){
+                $countAry[] = "$name=".$counter['hit'];
+            }
+        }
+        return implode(',', $countAry);
+    }
+    
     
     public static function getLevelName($level)
     {

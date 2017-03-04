@@ -68,7 +68,8 @@ class Controller extends Object{
     }
     
     public function render($templateId, $data = []){
-        $this->response->end($templateId);
+        $html = $templateId;
+        ResponseHelper::outputHtml($this->response, $html);
         $this->reset();
     }
     

@@ -26,12 +26,28 @@ class ResponseHelper
             'serverTime' => microtime(true)
         ));
         
-        Ysf::trace("trace message");
-        Ysf::getLogger()->flush();
-        
+        self::flushLog();
         $response->status($status);
         $response->header('Content-Type', 'application/json');
         $response->end($json);
+    }
+    
+    /**
+     * 
+     * @param \Swoole\Http\Response $response $response
+     * @param string $data
+     */
+    public static function outputHtml($response, $html, $status = 200)
+    {
+        self::flushLog();
+        $response->status($status);
+        $response->end($html);
+    }
+    
+    
+    private static function flushLog()
+    {
+        Ysf::getLogger()->flush();
     }
     
     
