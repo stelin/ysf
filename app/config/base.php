@@ -23,7 +23,7 @@ $config = [
                 'notice' => [
                     'class' => 'ysf\log\FileTarget',
                     'logFile' => '@runtime/notice.log',
-                    'levels' => ['trace', 'mysql', 'notice','mongo','redis', 'http'],
+                    'levels' => ['trace', 'notice'],
                 ],
                 'application' => [
                     'class' => 'ysf\log\FileTarget',

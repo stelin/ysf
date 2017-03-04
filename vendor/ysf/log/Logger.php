@@ -2,16 +2,14 @@
 namespace ysf\log;
 
 use ysf\base\Object;
+use ysf\base\ApplicationContext;
+use ysf\Ysf;
 
 class Logger extends Object
 {
     const LEVEL_ERROR = 0x01;
     const LEVEL_WARNING = 0x02;
-    const LEVEL_HTTP = 0x04;
     const LEVEL_TRACE = 0x08;
-    const LEVEL_MYSQL = 0x40;
-    const LEVEL_MONGO = 0x50;
-    const LEVEL_REDIS = 0x60;
     const LEVEL_NOTICE = 0x80;
     
     public $messages = [];
@@ -26,6 +24,11 @@ class Logger extends Object
 
     public function log($message, $level, $category = 'application')
     {
+        $logid = ApplicationContext::getContext(ApplicationContext::CONTEXT_LOGID);
+        $message = "[logid:".$logid."] ". $message;
+        
+        $category = $this->getCategory($category);
+        
         $time = microtime(true);
         $traces = [];
         if ($this->traceLevel > 0) {
@@ -54,6 +57,9 @@ class Logger extends Object
      */
     public function flush($final = false)
     {
+        // 所有日志后面追加一条notice日志
+        $this->apendNoticeLog();
+        
         $messages = $this->messages;
         $this->messages = [];
         if ($this->dispatcher instanceof Dispatcher) {
@@ -61,19 +67,56 @@ class Logger extends Object
         }
     }
     
+    /**
+     * 追加一条notice日志
+     */
+    public function apendNoticeLog()
+    {
+        $requestBeginTime = ApplicationContext::getContext(ApplicationContext::CONTEXT_BEGIN_TIME);
+        // php耗时单位ms毫秒
+        $timeUsed = sprintf("%.0f", (microtime(true)-$requestBeginTime)*1000);
+        // php运行内存大小单位M
+        $memUsed = sprintf("%.0f", memory_get_peak_usage()/(1024*1024));
+    
+        $profileInfo = '';
+        $countingInfo = '';
+        $pushlogs = [];
+        $uri = ApplicationContext::getContext(ApplicationContext::CONTEXT_URI);
+        
+    
+        $messageAry = array(
+            "[$timeUsed(ms)]",
+            "[$memUsed(MB)]",
+            "[{$uri}]",
+            "[".implode(" ", $pushlogs)."]",
+            "profile[".$profileInfo."]",
+            "counting[".$countingInfo."]"
+                );
+        $category = $this->getCategory();
+        $message = implode(" ", $messageAry);
+    
+//         $this->profiles = [];
+//         $this->countings = [];
+//         $this->pushlogs = [];
+//         $this->profileStacks = [];
+        $this->log($message, self::LEVEL_NOTICE, $category);
+    }
+    
     public static function getLevelName($level)
     {
         static $levels = [
             self::LEVEL_ERROR => 'error',
             self::LEVEL_WARNING => 'warning',
-            self::LEVEL_HTTP => 'http',
             self::LEVEL_TRACE => 'trace',
-            self::LEVEL_MONGO => 'mongodb',
-            self::LEVEL_MYSQL => 'mysql',
-            self::LEVEL_REDIS => 'redis',
             self::LEVEL_NOTICE => 'notice',
         ];
 
         return isset($levels[$level]) ? $levels[$level] : 'unknown';
+    }
+    
+    public static function getCategory($category = 'application')
+    {
+        $category = SYSTEM_NAME;
+        return $category;
     }
 }

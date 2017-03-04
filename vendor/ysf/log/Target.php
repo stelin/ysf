@@ -74,11 +74,7 @@ abstract class Target extends Object
         static $levelMap = [
             'error' => Logger::LEVEL_ERROR,
             'warning' => Logger::LEVEL_WARNING,
-            'http' => Logger::LEVEL_HTTP,
             'trace' => Logger::LEVEL_TRACE,
-            'mysql' => Logger::LEVEL_MYSQL,
-            'redis' => Logger::LEVEL_REDIS,
-            'mongo' => Logger::LEVEL_MONGO,
             'notice' => Logger::LEVEL_NOTICE,
         ];
         if (is_array($levels)) {

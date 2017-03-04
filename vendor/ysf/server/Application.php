@@ -10,6 +10,7 @@ use Swoole\Http\Server;
 use ysf\base\Controller;
 use ysf\Ysf;
 use ysf\helpers\ResponseHelper;
+use ysf\base\ApplicationContext;
 
 /**
  * http server 
@@ -220,6 +221,13 @@ class Application extends \ysf\web\Application implements InterfaceServer
      */
     public function onRequest(\Swoole\Http\Request $request, \Swoole\Http\Response $response)
     {
+        $logid = uniqid();
+        ApplicationContext::setContexts([
+            ApplicationContext::CONTEXT_LOGID => $logid,
+            ApplicationContext::CONTEXT_BEGIN_TIME => microtime(true),
+            ApplicationContext::CONTEXT_URI => $request->server['path_info']
+        ]);
+        
         register_shutdown_function(function() use ($response){
             $error = error_get_last();
             if (isset($error['type'])) {
@@ -249,6 +257,8 @@ class Application extends \ysf\web\Application implements InterfaceServer
         } catch (\Exception $e) {
             ResponseHelper::outputJson($response, null, $e->getMessage());
         }
+        
+        
     }
 
     /**

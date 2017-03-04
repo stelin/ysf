@@ -1,6 +1,8 @@
 <?php
 namespace ysf\helpers;
 
+use ysf\Ysf;
+
 class ResponseHelper
 {
     /**
@@ -23,6 +25,9 @@ class ResponseHelper
             'message'    => $message,
             'serverTime' => microtime(true)
         ));
+        
+        Ysf::trace("trace message");
+        Ysf::getLogger()->flush();
         
         $response->status($status);
         $response->header('Content-Type', 'application/json');

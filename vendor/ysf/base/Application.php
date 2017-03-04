@@ -73,16 +73,16 @@ abstract class Application extends ServiceLocator{
 //         Ysf::getLogger()->log("notice level", Logger::LEVEL_NOTICE);
 //         Ysf::getLogger()->log("warning level", Logger::LEVEL_WARNING);
         
-        Ysf::error("error");
-        Ysf::trace("trace");
-        Ysf::warning("warning");
-        Ysf::notice(Ysf::formateNotice(uniqid(), 231, "/index/index", ['a'=>'b','c'=>'d'], 500));
+//         Ysf::error("error");
+//         Ysf::trace("trace");
+//         Ysf::warning("warning");
+//         Ysf::notice(Ysf::formateNotice(uniqid(), 231, "/index/index", ['a'=>'b','c'=>'d'], 500));
         
-        Ysf::getLogger()->flush();
+//         Ysf::getLogger()->flush();
         
         
-        echo "333";
-        exit();
+//         echo "333";
+//         exit();
 
         
         $this->setings = $this->readServerConf();
