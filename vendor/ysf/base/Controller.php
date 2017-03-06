@@ -65,11 +65,55 @@ class Controller extends Object{
     {
         return true;
     }
-    
+
     public function beforeAction()
     {
         return true;
     }
+
+    protected function getGet($key, $default = null)
+    {
+        $get = $this->getGetParams();
+        return isset($get[$key])?$get[$key]:$default;
+    }
+    
+    protected function getPost($key, $default = null)
+    {
+        $post = $this->getPostParams();
+        return isset($post[$key]) ? $post[$key] : $default;
+    }
+    
+    protected function getRequest($key, $default = null)
+    {
+        $get = $this->getGetParams();
+        $post = $this->getPostParams();
+        $request = array_merge($get, $post);
+        
+        return isset($request[$key]) ? $request[$key] : $default;
+    }
+    
+    private function getGetParams()
+    {
+        $request = ApplicationContext::getRequest();
+        $get = [];
+        if (property_exists($request, 'get')) {
+            $get = $request->get;
+        }
+        
+        return $get;
+    }
+    
+    private function getPostParams()
+    {
+        $request = ApplicationContext::getRequest();
+        $post = [];
+        if (property_exists($request, 'post')) {
+            $get = $request->post;
+        }
+        
+        return $post;
+    }
+    
 
     private function getDefaultAction($id)
     {

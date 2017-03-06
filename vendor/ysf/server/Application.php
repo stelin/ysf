@@ -231,6 +231,7 @@ class Application extends \ysf\web\Application implements InterfaceServer
         
         // chrome 2 once request
         if(isset($request->server['request_uri']) && $request->server['request_uri'] == '/favicon.ico'){
+            $response->end("favicon.ico");
             return false;
         }
         

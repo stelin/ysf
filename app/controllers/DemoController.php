@@ -7,7 +7,7 @@ class DemoController extends Controller
 {
     public function actionIndex()
     {
-        $this->outputJson(null, "this default action");
+        $this->outputJson(null, "this default action name=".$this->getGet('name'));
     }
     public function actionShowHtml()
     {
