@@ -2,18 +2,18 @@
 namespace ysf\helpers;
 
 use ysf\Ysf;
+use ysf\base\ApplicationContext;
 
 class ResponseHelper
 {
     /**
      * 
-     * @param \Swoole\Http\Response $response
      * @param unknown $data
      * @param string $message
      * @param number $status
      * @param unknown $callback
      */
-    public static function outputJson($response, $data = null, $message = '', $status = 200, $callback = null)
+    public static function outputJson($data = null, $message = '', $status = 200, $callback = null)
     {
         if($data === null){
             $data = new \stdClass();
@@ -26,7 +26,9 @@ class ResponseHelper
             'serverTime' => microtime(true)
         ));
         
-        self::flushLog();
+        self::flushAndFree();
+        
+        $response = ApplicationContext::getResponse();
         $response->status($status);
         $response->header('Content-Type', 'application/json');
         $response->end($json);
@@ -34,18 +36,18 @@ class ResponseHelper
     
     /**
      * 
-     * @param \Swoole\Http\Response $response $response
      * @param string $data
      */
-    public static function outputHtml($response, $html, $status = 200)
+    public static function outputHtml($html, $status = 200)
     {
-        self::flushLog();
+        self::flushAndFree();
+        
+        $response = ApplicationContext::getResponse();
         $response->status($status);
         $response->end($html);
     }
     
-    
-    private static function flushLog()
+    private static function flushAndFree()
     {
         Ysf::getLogger()->flush();
     }

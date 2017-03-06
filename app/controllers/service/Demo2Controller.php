@@ -5,12 +5,12 @@ use ysf\base\Controller;
 use ysf\Ysf;
 
 class Demo2Controller extends Controller {
-    public function showJson()
+    public function actionShowJson()
     {
         $this->outputJson(null, "route show hello");
     }
     
-    public function hello()
+    public function actionHello()
     {
         Ysf::profileStart("helloClass");
         Ysf::warning("waning message");

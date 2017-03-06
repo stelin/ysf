@@ -7,40 +7,13 @@ use ysf\helpers\ResponseHelper;
 
 class Controller extends Object{
     
-    /**
-     * 
-     * @var \Swoole\Http\Request $request
-     */
-    protected $request = null;
-    /**
-     * @var \Swoole\Http\Response $response
-     */
-    protected $response = null;
-    
+    private $default_action = "index";
     private $controllerId = "";
     
     public function __construct($controllerId){
         $this->controllerId = $controllerId;
     }
     
-    
-    
-    /**
-     * @param \Swoole\Http\Request $request
-     */
-    public function setRequest($request)
-    {
-        $this->request = $request;
-    }
-
-    /**
-     * @param \Swoole\Http\Response $response
-     */
-    public function setResponse($response)
-    {
-        $this->response = $response;
-    }
-
     /**
      * 
      * @param string $route
@@ -59,31 +32,31 @@ class Controller extends Object{
         if($this->beforeAction() === false){
             return false;
         }
-        if (! method_exists($this, $id)) {
-//             throw new \Exception($id.' action not found!');
-//                throw new UnknownMethodException("action not found");
+        
+        $id = $this->getDefaultAction($id);
+        $method = 'action'.ucfirst($id);
+        if (! method_exists($this, $method)) {
+               throw new UnknownMethodException("action not found");
         }
         
-        return call_user_func_array([$this, $id], $params);
+        return call_user_func_array([$this, $method], $params);
     }
     
     public function render($templateId, $data = []){
         $html = $templateId;
-        ResponseHelper::outputHtml($this->response, $html);
+        ResponseHelper::outputHtml($html);
         $this->reset();
     }
     
     public function outputJson($data = null, $message = '', $status = 200, $callback = null)
     {
-        ResponseHelper::outputJson($this->response, $data, $message, $status, $callback);
+        ResponseHelper::outputJson($data, $message, $status, $callback);
         $this->reset();
     }
     
     public function reset()
     {
         $this->controllerId = "";
-        $this->request = null;
-        $this->response = null;
         ObjectPool::getInstance()->addObject($this->controllerId, $this);
     }
     
@@ -96,5 +69,11 @@ class Controller extends Object{
     public function beforeAction()
     {
         return true;
+    }
+
+    private function getDefaultAction($id)
+    {
+        $id = empty($id) ? $this->default_action : $id;
+        return $id;
     }
 }

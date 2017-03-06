@@ -5,7 +5,8 @@ class ApplicationContext {
     
     const CONTEXT_LOGID = "logid";
     const CONTEXT_BEGIN_TIME = "requestBeginTime";
-    const CONTEXT_URI = "requestUri";
+    const CONTEXT_REQUEST = "request";
+    const CONTEXT_RESPONSE = "response";
     
     private static $applicationContext = [];
     
@@ -33,6 +34,26 @@ class ApplicationContext {
         }
         return self::$applicationContext[md5($cid)][$key];
     }
+    
+    /**
+     * 
+     * @return \Swoole\Http\Request
+     */
+    public static function getRequest()
+    {
+        return self::getContext(self::CONTEXT_REQUEST);
+    }
+    
+    /**
+     *
+     * @return \Swoole\Http\Response
+     */
+    public static function getResponse()
+    {
+        return self::getContext(self::CONTEXT_RESPONSE);
+    }
+    
+    
     
     public static function clearContext()
     {

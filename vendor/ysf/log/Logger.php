@@ -87,7 +87,9 @@ class Logger extends Object
         $profileInfo = $this->getProfilesInfos();
         $countingInfo = $this->getCountingInfo();
         $pushlogs = isset($this->pushlogs[$logid]) ? $this->pushlogs[$logid]: [];
-        $uri = ApplicationContext::getContext(ApplicationContext::CONTEXT_URI);
+        
+        $request = ApplicationContext::getRequest();
+        $uri = $request->server['path_info'];
         
     
         $messageAry = array(

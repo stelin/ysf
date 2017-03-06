@@ -225,7 +225,8 @@ class Application extends \ysf\web\Application implements InterfaceServer
         ApplicationContext::setContexts([
             ApplicationContext::CONTEXT_LOGID => $logid,
             ApplicationContext::CONTEXT_BEGIN_TIME => microtime(true),
-            ApplicationContext::CONTEXT_URI => $request->server['path_info']
+            ApplicationContext::CONTEXT_REQUEST => $request,
+            ApplicationContext::CONTEXT_RESPONSE => $response,
         ]);
         
         // chrome 2 once request
@@ -239,11 +240,9 @@ class Application extends \ysf\web\Application implements InterfaceServer
             /* @var $controller Controller */
             list($controller, $actionId) = $this->createController($route);
             
-            $controller->setRequest($request);
-            $controller->setResponse($response);
             $controller->run($actionId, $params);
         } catch (\Exception $e) {
-            ResponseHelper::outputJson($response, null, $e->getMessage());
+            ResponseHelper::outputJson(null, $e->getMessage());
         }
         
         
