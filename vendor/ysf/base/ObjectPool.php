@@ -1,11 +1,15 @@
 <?php
 namespace ysf\base;
 
+use ysf\Ysf;
+
 class ObjectPool
 {
-    private static $maxObjs = 3;
+    private $maxObjs = 3;
+    private $poolSize = 1024*100;
+    private $pool = [];
+    
     private static $instance = null;
-    private static $pool = [];
     
     private function __construct()
     {
@@ -20,29 +24,33 @@ class ObjectPool
         return self::$instance;
     }
     
-    public static function getObject($name)
+    public function getObject($name)
     {
-        if (!isset(self::$pool[$name])) {
-            self::$pool[$name] = new \SplQueue();
+        if (!isset($this->pool[$name])) {
+            $this->pool[$name] = new \Swoole\Channel($this->poolSize);
         }
         
-        $objSplQueue = self::$pool[$name];
-        if($objSplQueue instanceof  \SplQueue && $objSplQueue->count() > 0){
-            return self::$pool[$name]->pop();
+        $channel = $this->pool[$name];
+        if($channel instanceof  \Swoole\Channel){
+            return $this->pool[$name]->pop();
         }
         return null;
     }
     
-    public static function addObject($name, $obj)
+    public function addObject($name, $obj)
     {
-        if (! isset(self::$pool[$name])) {
-            self::$pool[$name] = new \SplQueue();
+        if (!isset($this->pool[$name])) {
+            $this->pool[$name] = new \Swoole\Channel($this->poolSize);
         }
         
-        $objSplQueue = self::$pool[$name];
-        $objSplQueue = self::$pool[$name];
-        if($objSplQueue instanceof  \SplQueue && $objSplQueue->count() < self::$maxObjs){
-            self::$pool[$name]->push($obj);
+        $channel = $this->pool[$name];
+        if($channel instanceof  \Swoole\Channel){
+            
+            $stats = $this->pool[$name]->stats();
+            if($stats['queue_num'] < $this->maxObjs){
+                $this->pool[$name]->push($obj);
+            }
+            
         }
     }
 }

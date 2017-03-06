@@ -56,7 +56,7 @@ class Application extends \ysf\web\Application implements InterfaceServer
         $this->server = new \Swoole\Http\Server($httpConf['host'], $httpConf['port'], $httpConf['model'], $httpConf['type']);
         
         Ysf::setApp($this);
-        $this->server->set($this->setings);
+        $this->server->set($this->settings);
         $this->server->on('start', [$this, 'onStart']);
         $this->server->on('workerstart', [$this, 'onWorkerStart']);
         $this->server->on('task', [$this, 'onTask']);

@@ -27,6 +27,7 @@ abstract class Application extends ServiceLocator{
     public $name;
     public $basePath;
     public $runtimePath;
+    public $settingPath;
     public $defaultRoute = "/index/index";
     public $components;
     
@@ -39,7 +40,7 @@ abstract class Application extends ServiceLocator{
     public $controllerNamespace = 'app\\controllers';
     
     
-    protected $setings = [];
+    protected $settings = [];
     private $version = "0.1";
     
     
@@ -69,7 +70,7 @@ abstract class Application extends ServiceLocator{
      */
     public function run()
     {
-        $this->setings = $this->readServerConf();
+        $this->settings = $this->getSettings();
         
         global $argv;
         $this->parseCommand($argv);
@@ -80,26 +81,9 @@ abstract class Application extends ServiceLocator{
         return $this->version;
     }
     
-    public function readServerConf()
+    public function getSettings()
     {
-        $path = "/home/worker/data/www/ysf/bin/ysf.conf";
-        
-        $serverConfs = [];
-        $fp = @fopen($path, "r");
-        while (! feof($fp)){
-            $line = fgets($fp);
-            if(strpos($line, "#") === 0){
-                continue;
-            }
-            $result = preg_match("/\s*([a-z0-9\-\._\-]+)\s*=\s*(([0-9]+) | \"*\'*([a-z0-9\-\._\-\/]+)\"*\'*)/", $line, $confs);
-            if($result && isset($confs[1]) && isset($confs[4])){
-                $key = $confs[1];
-                $value = $confs[4];
-                $serverConfs[$key] = $value;
-            }
-        }
-        
-        return $serverConfs;
+        return parse_ini_file($this->settingPath);
     }
     
     public function coreComponents()

@@ -1,13 +1,15 @@
 <?php
 !defined('SYSTEM_NAME') && define('SYSTEM_NAME', 'ysf');
-!defined('WWW_DIR') && define('WWW_DIR', realpath(__DIR__ . '/../../..'));
-!defined('RUNTIME_DIR') && define('RUNTIME_DIR', WWW_DIR . '/runtime/' . SYSTEM_NAME);
+!defined('APP_PATH') && define('APP_PATH',  dirname(__FILE__).'/../../');
+!defined('RUNTIME_PATH') && define('RUNTIME_PATH',  APP_PATH.'runtime/' . SYSTEM_NAME);
+!defined('SETTING_PATH') && define('SETTING_PATH',  APP_PATH.'bin/ysf.ini');
 
 $config = [
     'id' => SYSTEM_NAME,
     'basePath' =>dirname( __DIR__),
     'name' => SYSTEM_NAME,
-    'runtimePath' => RUNTIME_DIR,
+    'runtimePath' => RUNTIME_PATH,
+    'settingPath' => SETTING_PATH,
     'tcpEnable' => false,
     
     // 组件配置
