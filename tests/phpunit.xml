@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="phpunit.xsd"
+         bootstrap="bootstrap.php"
+         backupGlobals="false"
+         verbose="true">
+  <filter>
+		<whitelist addUncoveredFilesFromWhitelist="true">
+			<directory suffix=".php">../app/models</directory>
+		</whitelist>
+  </filter>
+  <testsuites>
+    <testsuite name="test">
+      <directory suffix="Test.php">../app/tests/</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>
+
