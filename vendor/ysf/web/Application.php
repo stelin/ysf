@@ -10,8 +10,17 @@ abstract class Application extends \ysf\base\Application
     private $command = "";
     private $startFile = "";
     protected $pidFile = '/tmp/ysf.pid';
+    protected $settings = [];
+    public $settingPath;
     
     
+    
+    public function run(){
+        $this->settings = $this->getSettings();
+        
+        global $argv;
+        $this->parseCommand($argv);
+    }
     /**
      * parse command
      *
@@ -100,14 +109,10 @@ abstract class Application extends \ysf\base\Application
         $this->parseStart();
     }
     
-    public function getUrlManager()
+    public function getSettings()
     {
-        return $this->get('urlManager');
+        return parse_ini_file($this->settingPath);
     }
     
-    public function getLog()
-    {
-        return $this->get('log');
-    }
-    
+    public abstract function start();
 }

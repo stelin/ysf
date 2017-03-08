@@ -23,25 +23,17 @@ use ysf\log\Logger;
  * @since 0.1
  */
 abstract class Application extends ServiceLocator{
+    
+    private $version = "0.1";
+    
     public $id;
     public $name;
     public $basePath;
     public $runtimePath;
-    public $settingPath;
     public $defaultRoute = "/index/index";
     public $components;
-    
-    public $tcp = [];
-    public $http = [];
     public $params = [];
-    public $tcpEnable = true;
-    public $processName = "php-ysf";
-    
     public $controllerNamespace = 'app\\controllers';
-    
-    
-    protected $settings = [];
-    private $version = "0.1";
     
     
     
@@ -65,25 +57,9 @@ abstract class Application extends ServiceLocator{
         set_error_handler([$this, 'handlerError']);
     }
     
-    /**
-     * 运行服务
-     */
-    public function run()
-    {
-        $this->settings = $this->getSettings();
-        
-        global $argv;
-        $this->parseCommand($argv);
-    }
-    
     public function getVersion()
     {
         return $this->version;
-    }
-    
-    public function getSettings()
-    {
-        return parse_ini_file($this->settingPath);
     }
     
     public function coreComponents()
@@ -306,16 +282,20 @@ abstract class Application extends ServiceLocator{
         }
     }
     
+    public function getUrlManager()
+    {
+        return $this->get('urlManager');
+    }
+    
+    public function getLog()
+    {
+        return $this->get('log');
+    }
+    
     public function handlerError($error, $error_string, $filename, $line, $symbols)
     {
         Ysf::error($filename.":".$line." ".$error_string);
     }
     
-    public abstract function start();
-    public abstract function parseCommand($args);
-    public abstract function parseStart();
-    public abstract function parseStop();
-    public abstract function parseReload();
-    public abstract function parseRestart();
-    
+    abstract public function run();
 }

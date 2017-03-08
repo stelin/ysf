@@ -6,7 +6,7 @@ $config = ysf\helpers\ArrayHelper::merge(
 
         ],
         'params' => [
-            'testing' => 'testing'
+            'testing' => 'testing',
         ]
     ]
 );

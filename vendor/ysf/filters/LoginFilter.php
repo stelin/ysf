@@ -9,7 +9,7 @@ class LoginFilter extends Filter
     
     public function preFilter()
     {
-        return false;
+        return true;
     }
     
     public function postFilter()

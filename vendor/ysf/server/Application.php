@@ -20,6 +20,12 @@ use ysf\base\ApplicationContext;
  */
 class Application extends \ysf\web\Application implements InterfaceServer
 {
+    public $tcpEnable = true;
+    public $tcp = [];
+    public $http = [];
+    public $processName = "php-ysf";
+    
+    
 
     /**
      * @var string
