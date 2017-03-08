@@ -1,6 +1,8 @@
 <?php
 namespace ysf\base;
 
+use ysf\Ysf;
+
 class ApplicationContext {
     
     const CONTEXT_LOGID = "logid";
@@ -20,6 +22,7 @@ class ApplicationContext {
     }
     
     public static function setContexts(array $contexts){
+        
         $cid = \Swoole\Coroutine::getuid();
         foreach ($contexts as $key => $context){
             self::$applicationContext[md5($cid)][$key] = $context;

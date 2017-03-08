@@ -26,7 +26,7 @@ class ResponseHelper
             'serverTime' => microtime(true)
         ));
         
-        self::flushAndFree();
+        self::flush();
         
         $response = ApplicationContext::getResponse();
         $response->status($status);
@@ -40,14 +40,14 @@ class ResponseHelper
      */
     public static function outputHtml($html, $status = 200)
     {
-        self::flushAndFree();
+        self::flush();
         
         $response = ApplicationContext::getResponse();
         $response->status($status);
         $response->end($html);
     }
     
-    private static function flushAndFree()
+    private static function flush()
     {
         Ysf::getLogger()->flush();
     }

@@ -235,6 +235,7 @@ class Application extends \ysf\web\Application implements InterfaceServer
             return false;
         }
         
+        $controller = null;
         try {
             list($route, $params) = $this->urlManager->parseRequest($request);
             
@@ -244,6 +245,7 @@ class Application extends \ysf\web\Application implements InterfaceServer
             $controller->run($actionId, $params);
         } catch (\Exception $e) {
             ResponseHelper::outputJson(null, $e->getMessage());
+            $controller->free();
         }
         
         

@@ -4,14 +4,18 @@ namespace ysf\base;
 use ysf\Ysf;
 use ysf\exception\UnknownMethodException;
 use ysf\helpers\ResponseHelper;
+use ysf\filters\FilterChain;
+use ysf\filters\Filter;
 
 class Controller extends Object{
     
     private $default_action = "index";
     private $controllerId = "";
+    private $filterChain = null;
     
     public function __construct($controllerId){
         $this->controllerId = $controllerId;
+        $this->filterChain = new FilterChain();
     }
     
     /**
@@ -22,42 +26,29 @@ class Controller extends Object{
      */
     public function run($route, $params = [])
     {
-        return $this->runAction($route, $params);
-    }
-    
-    
-    public function runAction($id, $params = [])
-    {
-        
-        if($this->beforeAction() === false){
-            return false;
-        }
-        
-        $id = $this->getDefaultAction($id);
-        $method = 'action'.ucfirst($id);
-        if (! method_exists($this, $method)) {
-               throw new UnknownMethodException("action not found");
-        }
-        
-        return call_user_func_array([$this, $method], $params);
+        $this->runActionWithFilters($route, $params);
     }
     
     public function render($templateId, $data = []){
         $html = $templateId;
         ResponseHelper::outputHtml($html);
-        $this->reset();
+        $this->free();
     }
     
     public function outputJson($data = null, $message = '', $status = 200, $callback = null)
     {
         ResponseHelper::outputJson($data, $message, $status, $callback);
-        $this->reset();
+        $this->free();
     }
     
-    public function reset()
+    public function free()
     {
-        $this->controllerId = "";
+        while ($this->filterChain->isEmpty() == false){
+            $this->filterChain->shift();
+        }
+        
         ObjectPool::getInstance()->addObject($this->controllerId, $this);
+        ApplicationContext::clearContext();
     }
     
     
@@ -91,6 +82,47 @@ class Controller extends Object{
         
         return isset($request[$key]) ? $request[$key] : $default;
     }
+    
+    protected function filters()
+    {
+        return [];
+    }
+    
+    
+    public function runActionWithFilters($route, $params)
+    {
+        foreach ($this->filters() as $filter){
+            if($filter instanceof Filter){
+                $this->filterChain->push($filter);
+            }
+        }
+    
+        if($this->filterChain->isEmpty()){
+            $this->runAction($route, $params);
+        }else{
+            $this->filterChain->setController($this);
+            $this->filterChain->setRoute($route);
+            $this->filterChain->setParams($params);
+            $this->filterChain->run();
+        }
+    }
+    
+    
+    public function runAction($id, $params = [])
+    {
+        if($this->beforeAction() === false){
+            throw new \Exception("before action error");
+        }
+    
+        $id = $this->getDefaultAction($id);
+        $method = 'action'.ucfirst($id);
+        if (! method_exists($this, $method)) {
+            throw new UnknownMethodException("action not found");
+        }
+    
+        return call_user_func_array([$this, $method], $params);
+    }
+    
     
     private function getGetParams()
     {
