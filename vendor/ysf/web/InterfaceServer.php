@@ -4,7 +4,7 @@
  * @copyright Copyright 2016-2017 stelin develper.
  * @license https://github.com/stelin/ysf/license/
  */
-namespace ysf\server;
+namespace ysf\web;
 
 /**
  * swoole callback list

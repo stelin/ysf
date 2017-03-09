@@ -24,15 +24,13 @@ use ysf\log\Logger;
  */
 abstract class Application extends ServiceLocator{
     
-    private $version = "0.1";
-    
     public $id;
     public $name;
     public $basePath;
-    public $runtimePath;
-    public $defaultRoute = "/index/index";
     public $components;
     public $params = [];
+    public $runtimePath;
+    public $defaultRoute = "/index/index";
     public $controllerNamespace = 'app\\controllers';
     
     
@@ -55,11 +53,6 @@ abstract class Application extends ServiceLocator{
         // 错误处理
         register_shutdown_function([$this, 'handlerFataError']);
         set_error_handler([$this, 'handlerError']);
-    }
-    
-    public function getVersion()
-    {
-        return $this->version;
     }
     
     public function coreComponents()

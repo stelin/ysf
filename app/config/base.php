@@ -10,7 +10,6 @@ $config = [
     'name' => SYSTEM_NAME,
     'runtimePath' => RUNTIME_PATH,
     'settingPath' => SETTING_PATH,
-    'tcpEnable' => false,
     
     // 组件配置
     'components' => [
