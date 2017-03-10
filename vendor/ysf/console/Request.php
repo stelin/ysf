@@ -7,6 +7,8 @@ class Request extends Object
 {
     private $_params;
     
+    public $server;
+    
     
     public function getParams()
     {

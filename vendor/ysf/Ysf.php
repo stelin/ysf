@@ -51,7 +51,7 @@ class Ysf
         return $object;
     }
     /**
-     * @return \ysf\base\Application
+     * @return \ysf\web\Application|\ysf\console\Application
      */
     public static function app()
     {

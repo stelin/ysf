@@ -6,9 +6,9 @@ use ysf\Ysf;
 class ApplicationContext {
     
     const CONTEXT_LOGID = "logid";
-    const CONTEXT_BEGIN_TIME = "requestBeginTime";
     const CONTEXT_REQUEST = "request";
     const CONTEXT_RESPONSE = "response";
+    const CONTEXT_BEGIN_TIME = "requestBeginTime";
     
     private static $applicationContext = [];
     
@@ -31,6 +31,10 @@ class ApplicationContext {
     
     public static function getContext(string $key)
     {
+        // ysf console comamnd
+        if(defined('CONSOLE') && CONSOLE == 1){
+            return self::getConsoleContext($key);
+        }
         $cid = \Swoole\Coroutine::getuid();
         if(!isset(self::$applicationContext[md5($cid)][$key])){
             return null;
@@ -56,6 +60,16 @@ class ApplicationContext {
         return self::getContext(self::CONTEXT_RESPONSE);
     }
     
+    public static function getLogid()
+    {
+        return self::getContext(self::CONTEXT_LOGID);
+    }
+    
+    public static function getBeginTime()
+    {
+        return self::getContext(self::CONTEXT_BEGIN_TIME);
+    }
+    
     
     
     public static function clearContext()
@@ -64,5 +78,28 @@ class ApplicationContext {
         if(isset(self::$applicationContext[md5($cid)])){
             unset(self::$applicationContext[md5($cid)]);
         }
+    }
+    
+    private static function getConsoleContext($key)
+    {
+        $context = null;
+        switch ($key) {
+            case self::CONTEXT_LOGID:
+                $logid = isset($_SERVER['logid']) ? $_SERVER['logid'] : uniqid();
+                $context = $logid;
+                break;
+            case self::CONTEXT_BEGIN_TIME:
+                $beginTime = defined('BEGIN_TIME') ? BEGIN_TIME: microtime(true);
+                $context = $beginTime;
+                break;
+            case self::CONTEXT_REQUEST:
+                $context = Ysf::app()->request;
+                break;
+            case self::CONTEXT_RESPONSE:
+                $context = $context = Ysf::app()->response;
+                break;
+        }
+        
+        return $context;
     }
 }

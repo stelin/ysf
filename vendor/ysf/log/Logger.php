@@ -29,7 +29,7 @@ class Logger extends Object
 
     public function log($message, $level, $category = 'application')
     {
-        $logid = ApplicationContext::getContext(ApplicationContext::CONTEXT_LOGID);
+        $logid = ApplicationContext::getLogid();
         $message = "[logid:".$logid."] ". $message;
         
         $category = $this->getCategory($category);
@@ -63,7 +63,9 @@ class Logger extends Object
     public function flush($final = false)
     {
         // 所有日志后面追加一条notice日志
-        $this->apendNoticeLog();
+        if($final){
+            $this->apendNoticeLog();
+        }
         
         $messages = $this->messages;
         $this->messages = [];
@@ -77,8 +79,8 @@ class Logger extends Object
      */
     public function apendNoticeLog()
     {
-        $logid = ApplicationContext::getContext(ApplicationContext::CONTEXT_LOGID);
-        $requestBeginTime = ApplicationContext::getContext(ApplicationContext::CONTEXT_BEGIN_TIME);
+        $logid = ApplicationContext::getLogid();
+        $requestBeginTime = ApplicationContext::getBeginTime();
         // php耗时单位ms毫秒
         $timeUsed = sprintf("%.2f", (microtime(true)-$requestBeginTime)*1000);
         // php运行内存大小单位M

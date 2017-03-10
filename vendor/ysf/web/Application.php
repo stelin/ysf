@@ -18,7 +18,7 @@ use ysf\base\ApplicationContext;
  * @author stelin <phpcrazy@126.com>
  * @since 0.1
  */
-class Application extends \ysf\base\Application implements InterfaceServer
+class Application extends \ysf\base\Application implements IServer
 {
     use CommandLine;
     

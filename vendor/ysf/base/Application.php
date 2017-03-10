@@ -30,6 +30,7 @@ abstract class Application extends ServiceLocator{
     public $components;
     public $params = [];
     public $runtimePath;
+    public $settingPath;
     public $defaultRoute = "/index/index";
     public $controllerNamespace = 'app\\controllers';
     
@@ -256,7 +257,8 @@ abstract class Application extends ServiceLocator{
             return null;
         }
     
-        if (is_subclass_of($className, 'ysf\base\Controller')) {
+        $isConsole = defined('CONSOLE') && CONSOLE == 1 && is_subclass_of($className, 'ysf\console\Controller');
+        if (is_subclass_of($className, 'ysf\base\Controller') || $isConsole) {
             $controller = new $className($id);
             return get_class($controller) === $className ? $controller : null;
         }else{

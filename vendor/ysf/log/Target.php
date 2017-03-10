@@ -21,8 +21,8 @@ abstract class Target extends Object
     {
         $this->messages = array_merge($this->messages, static::filterMessages($messages, $this->getLevels(), $this->categories, $this->except));
         $count = count($this->messages);
+        
         if ($count > 0 && ($final || $this->exportInterval > 0 && $count >= $this->exportInterval)) {
-            
             $oldExportInterval = $this->exportInterval;
             $this->exportInterval = 0;
             $this->export();

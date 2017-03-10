@@ -16,8 +16,6 @@ trait CommandLine
     private $managerPid = 0;
     private $startFile = "";
     
-    public $settingPath;
-    
     public function run(){
         
         $this->initConfig();

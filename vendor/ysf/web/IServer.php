@@ -12,7 +12,7 @@ namespace ysf\web;
  * @author stelin <phpcrazy@126.com>
  * @since 0.1
  */
-interface InterfaceServer
+interface IServer
 {
 
     /**
