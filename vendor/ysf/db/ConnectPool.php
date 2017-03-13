@@ -1,46 +1,38 @@
 <?php
-namespace ysf\base;
+namespace ysf\db;
+
+use ysf\Ysf;
+use Swoole\Lock;
+use ysf\base\IPool;
 
 abstract class ConnectPool implements IPool{
     
     protected $maxSize = 10;
-    protected $poolSize = 1024*100;
+    protected static $poolSize = 1024*100;
     
-    private $channel = null;
-    private static $instance = null;
+    protected static $channel = null;
+    protected static $instance = null;
     
-    public static function getInstance(){
-        if(self::$instance == null){
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
-    
-    public function get($config){
-        if($this->channel == null){
-            $this->channel = new Swoole\Channel($poolSize);
-        }
-        
-        $connect = $this->channel->pop();
+    public function getConnect(){
+        $connect = self::$channel->pop();
         if($connect === false){
-            return $this->create($config);
+            return $this->create();
         }
-        
         return $connect;
     }
     
-    public function create($config){
+    public function create(){
         
     }
     public function free($object){
-        if($this->channel == null){
+        if(self::$channel == null){
             throw new \Exception("pool channel pool is null");
         }
         
-        if($this->channel instanceof  \Swoole\Channel){
-            $stats = $this->channel->stats();
+        if(self::$channel instanceof  \Swoole\Channel){
+            $stats = self::$channel->stats();
             if($stats['queue_num'] < self::$maxSize){
-                $this->channel->push($object);
+                self::$channel->push($object);
             }
         }
     }

@@ -1,5 +1,5 @@
 <?php
-namespace ysf\base;
+namespace ysf\db;
 
 class RedisConnect extends \Swoole\Coroutine\Redis
 {

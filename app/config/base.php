@@ -40,7 +40,7 @@ $config = [
 
     // 参数配置
     'params' => [
-        
+        'cache' => require(dirname(__FILE__) . '/cache.php'),
     ],
 ];
 
