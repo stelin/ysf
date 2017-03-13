@@ -49,7 +49,7 @@ class ResponseHelper
     
     private static function flush()
     {
-        Ysf::getLogger()->flush();
+        Ysf::getLogger()->flush(true);
     }
     
     

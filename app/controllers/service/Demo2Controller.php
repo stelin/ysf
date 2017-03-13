@@ -28,6 +28,7 @@ class Demo2Controller extends Controller {
         Ysf::counting("redis.get", 1, 10);
         Ysf::counting("redis.get", 2, 100);
         
+        Ysf::trace("stelin");
         $str = 'hello'.SYSTEM_NAME.json_encode(RedisLogic::getInstance()->redisMuti());
         
         
