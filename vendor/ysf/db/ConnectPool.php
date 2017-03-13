@@ -3,8 +3,9 @@ namespace ysf\base;
 
 abstract class ConnectPool implements IPool{
     
-    private $maxSize = 10;
-    private $poolSize = 1024*100;
+    protected $maxSize = 10;
+    protected $poolSize = 1024*100;
+    
     private $channel = null;
     private static $instance = null;
     
