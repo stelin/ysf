@@ -3,6 +3,7 @@ namespace app\controllers\service;
 
 use ysf\base\Controller;
 use ysf\Ysf;
+use app\models\logic\RedisLogic;
 
 class Demo2Controller extends Controller {
     public function actionShowJson()
@@ -27,9 +28,8 @@ class Demo2Controller extends Controller {
         Ysf::counting("redis.get", 1, 10);
         Ysf::counting("redis.get", 2, 100);
         
-        $str = 'hello'.SYSTEM_NAME;
+        $str = 'hello'.SYSTEM_NAME.json_encode(RedisLogic::getInstance()->redisMuti());
         
-        $a = $b;
         
         $this->outputJson(null, $str);
     }

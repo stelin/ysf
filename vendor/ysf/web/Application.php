@@ -23,12 +23,20 @@ class Application extends \ysf\base\Application implements IServer
     use CommandLine;
     
     /**
+     * @var \swoole\Lock single instance lock
+     */
+    public $singleLock = null;
+    
+    /**
      * @var \Swoole\Server\Port
      */
     private $listen = null;
     
     public function start()
     {
+        // 单例排它锁
+        $this->singleLock = new \swoole\Lock(SWOOLE_MUTEX);;
+        
         $httpConf = $this->http;
         $this->server = new \Swoole\Http\Server($httpConf['host'], $httpConf['port'], $httpConf['model'], $httpConf['type']);
         
